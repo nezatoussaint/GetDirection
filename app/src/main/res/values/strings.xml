@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GetDirection</string>
+    <string name="title_activity_maps">MapDirection</string>
+</resources>
