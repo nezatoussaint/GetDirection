@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-//THIS is th main of this project and it extends on fragment Activity
+//THIS is th main default constructor of this project and it extends on fragment Activity
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -48,7 +48,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         listPoints = new ArrayList<>();
     }
-
 
     /**
      * Manipulates the map once available.
