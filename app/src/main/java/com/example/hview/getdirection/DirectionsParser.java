@@ -1,17 +1,11 @@
 package com.example.hview.getdirection;
-
 import com.google.android.gms.maps.model.LatLng;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-
-
 public class DirectionsParser {
     /**
      * Returns a list of lists containing latitude and longitude from a JSONObject
@@ -80,9 +74,7 @@ public class DirectionsParser {
                 shift += 5;
             } while (b >= 0x20);
             int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-
-            shift = 0;
+            lat += dlat;shift = 0;
             result = 0;
             do {
                 b = encoded.charAt(index++) - 63;
