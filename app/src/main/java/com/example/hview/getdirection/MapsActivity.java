@@ -16,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,7 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                //Rest Marker when arleady 2
+                //Reset Marker when arleady 2
                 if (listPoints.size() == 2)
                 {
                     listPoints.clear();
@@ -93,27 +94,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 mMap.addMarker(markerOptions);
 
+
                 if (listPoints.size() ==2 )
                 {
                     //Create URL to get request from first marker to secnd marker
                     String url = getRequestUrl(listPoints.get(0), listPoints.get(1));
-                    TaskrequestDirections taskrequestDirections = new TaskrequestDirections();
-                    taskrequestDirections.execute(url);                }
+                    TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+                    taskRequestDirections.execute(url);                }
             }
         });
 
 
     }
 
-    private String getRequestUrl(LatLng orgin, LatLng destination) {
+    private String getRequestUrl(LatLng orgin, LatLng dest) {
         //Value of origin
-        String str_orgin = "Orgine" + orgin.latitude + "," + orgin.longitude;
+        String str_orgin = "orgine" + orgin.latitude + "," + orgin.longitude;
         //Value of destination
-        String str_destination = "Destination" + destination + "'" + destination.longitude;
+        String str_destination = "destination" + dest + "," + dest.longitude;
         //Get value enable the sensor
         String sensor = "sensor=false";
         //Mode for find direction
-        String mode = "mode=moving";
+        String mode = "mode=driving";
         //Build the full params
 
         String param = str_orgin + "&" + str_destination + "&" +sensor +"&" + mode;
@@ -123,13 +125,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
         return url;
     }
-    private String requestDirection (String repUrl) throws IOException {
+    private String requestDirection (String reqUrl) throws IOException {
         String responseString = "";
         InputStream inputStream =  null;
         HttpURLConnection httpURLConnection = null;
         try
         {
-            URL url = new URL(repUrl);
+            URL url = new URL(reqUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.connect();
             //Get the response result
@@ -158,34 +160,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         return  responseString;
     }
-
-
-
 @SuppressLint("MissingPermission")
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case LOCATION_REQUEST:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
+
                     mMap.setMyLocationEnabled(true);
               }
               break;
       }
     }
-
-
-
-    public class TaskrequestDirections extends AsyncTask<String,  Void, String>
+    public class TaskRequestDirections extends AsyncTask<String,  Void, String>
     {
 
         @Override
@@ -226,33 +213,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
-            //Get List Route and displat it into the map
-            ArrayList points  = null;
-            PolylineOptions polylineOptions =  null;
-            for (List<HashMap<String, String>> path :  lists)
+            //Get List routes and display it to the map
+        ArrayList points = null;
+           // ArrayList points = new ArrayList();
+            PolylineOptions polylineOptions = null;
+            for (List<HashMap<String, String>> path: lists)
             {
                 points = new ArrayList();
-                polylineOptions = new PolylineOptions();
-                for ( HashMap<String, String> point :path )
-                {
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lon = Double.parseDouble(point.get("lon"));
-                    points.add(new LatLng(lat, lon));
+               polylineOptions = new PolylineOptions();
+               for (HashMap<String, String> point :  path)
+               {
 
-                }
+                   double lat = Double.parseDouble(point.get("lat"));
+                   double lon = Double.parseDouble(point.get("lon"));
+
+                   points.add(new LatLng(lat, lon));
+
+               }
                 polylineOptions.addAll(points);
-                polylineOptions.width(3);
-                polylineOptions.color(Color.BLUE);
-                polylineOptions.geodesic(true);
+               polylineOptions.width(1);
+               polylineOptions.color(Color.BLUE);
+               polylineOptions.geodesic(true);
+
 
             }
             if (polylineOptions != null)
             {
                 mMap.addPolyline(polylineOptions);
 
-            }else
-            {
-                Toast.makeText(getApplicationContext(), "Direction not found", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(getApplicationContext(), "Direction no found", Toast.LENGTH_SHORT).show();
             }
         }
     }
